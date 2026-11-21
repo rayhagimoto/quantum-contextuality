@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<script src="presentation-theme.js"></script>
+<script src="sign-glyphs.js"></script>
+<script>if (new URLSearchParams(location.search).has("proof")) document.documentElement.classList.add("proof-mode");</script>
+<title>Mermin–Peres sign game</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="math.css">
+<link rel="stylesheet" href="layout.css">
+<style>
+:root {
+  color-scheme: light;
+  --canvas: #fff;
+  --ink: #131a5d;
+  --muted: #606b86;
+  --surface: #e9edf3;
+  --tile-related: #e8f5f3;
+  --tile-hover: #d8efec;
+  --tile-click: #b8e7e1;
+  --INFQ_TEAL_TEXT: #18B3B1;
+  --INFQ_TEAL: #41E0D1;
+  --accent: var(--INFQ_TEAL_TEXT);
+  --electron-core: var(--INFQ_TEAL_TEXT);
+  --success: #17713a;
+  --error: #b42318;
+  --button-bg: #131a5d;
+  --button-ink: #fff;
+  --button-hover: #25307d;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: Poppins, sans-serif;
+  --edge: 24px;
+  --results: 128px;
+  --gap: var(--slide-tile-gap);
+  --button-radius: 6px;
+  --tile-radius: 13.2px;
+  --cell: min(var(--slide-tile-size), calc((100vw - var(--edge) - var(--edge) - var(--results) - var(--gap) - var(--gap) - var(--gap)) / 3), calc((100dvh - 450px) / 3));
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: #10172b;
+  --ink: #c3ccdf;
+  --muted: #a5b3cf;
+  --surface: #25324d;
+  --tile-related: #1c383f;
+  --tile-hover: #224b50;
+  --tile-click: #306b6a;
+  --accent: var(--INFQ_TEAL);
+  --electron-core: #dffffb;
+  --success: #8ae0a1;
+  --error: #ffada3;
+  --button-bg: var(--INFQ_TEAL);
+  --button-ink: #10172b;
+  --button-hover: #73e2da;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+button { font: inherit; cursor: pointer; border: 0; border-radius: var(--button-radius); }
+.game {
+  position: relative;
+  left: calc((var(--results) + var(--gap)) / 2);
+  isolation: isolate;
+  width: max-content;
+  max-width: 100%;
+  margin: calc(var(--slide-board-top) - 8px) auto 0;
+  padding: 8px var(--edge) 16px;
+}
+.board-heading {
+  position: fixed;
+  top: 120px;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  text-align: left;
+}
+.instructions { margin: 0; font-size: clamp(20px, 2.1vw, 40px); line-height: 1.4; text-shadow: 0 0 8px var(--canvas), 0 0 16px var(--canvas); }
+.board {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, var(--cell)) var(--results);
+  grid-template-rows: repeat(3, var(--cell)) 60px;
+  gap: var(--gap);
+}
+.circuitry { position: fixed; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 1; }
+.trace { fill: none; stroke: var(--accent); stroke-width: 1; opacity: .05; }
+.circuit-node { fill: var(--canvas); stroke: var(--accent); stroke-width: 1; opacity: .05; }
+.electron-wake { fill: none; stroke: var(--accent); stroke-width: 1; stroke-linecap: round; filter: drop-shadow(0 0 2px var(--accent)); }
+.electron { fill: var(--electron-core); filter: drop-shadow(0 0 2px var(--accent)); }
+.cell {
+  position: relative;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: var(--tile-radius);
+  padding: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: clamp(30px, calc(var(--cell) * .5), 88px);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition: background-color 120ms ease;
+}
+.cell:disabled { cursor: default; opacity: 1; }
+.cell .value { position: relative; z-index: 2; }
+.cell.related { background: var(--tile-related); }
+.cell:enabled:hover, .cell:focus-visible { background: var(--tile-hover); }
+button:focus-visible { outline: 3px solid var(--success); outline-offset: 4px; }
+.result {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 7.2px;
+  background: var(--canvas);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(16px, 1.9vw, 28px);
+  line-height: 1;
+}
+.result .target { color: var(--muted); font-size: clamp(11px, 1.05vw, 15px); font-weight: 400; }
+.result .reading { display: flex; align-items: center; gap: 7px; }
+.result .actual { font-weight: 700; }
+.result .mark { width: 20px; font-size: .78em; color: var(--success); }
+.result.mismatch .actual, .result.mismatch .mark { color: var(--error); }
+.result.mismatch .actual { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
+.result.corrected .actual, .result.corrected .mark { color: var(--success); }
+.result.corrected .reading { text-shadow: 0 0 12px color-mix(in srgb, var(--success) 45%, transparent); }
+.result.broken .reading { text-shadow: 0 0 12px color-mix(in srgb, var(--error) 45%, transparent); }
+.controls {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  margin-left: calc(var(--cell) * -.5);
+}
+.randomize {
+  min-height: 44px;
+  padding: 10px 20px;
+  color: var(--button-ink);
+  background: var(--button-bg);
+  font-size: clamp(14px, 1.2vw, 18px);
+  font-weight: 500;
+}
+.randomize:hover { background: var(--button-hover); }
+.secondary { display: flex; align-items: center; gap: 24px; }
+.score { color: var(--muted); font-size: clamp(13px, 1.2vw, 18px); font-variant-numeric: tabular-nums; }
+.hint { min-height: 44px; padding: 8px 0; background: none; border: 0; color: var(--muted); font-size: clamp(13px, 1.2vw, 18px); text-decoration: underline; text-underline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.placeholder { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; font-family: var(--math-variable-font); }
+.equation { display: none; font-family: var(--math-variable-font); color: var(--ink); font-size: 32px; }
+.cell .value, .cell .placeholder { display: none; }
+.glyph { position: absolute; inset: 0; width: 100%; height: 100%; fill: currentColor; pointer-events: none; }
+.equation .constant { font-family: var(--math-font); }
+.proof-mode .cell .value { opacity: 0; }
+.proof-mode .placeholder { opacity: 1; }
+.proof-mode .board-heading { opacity: 0; pointer-events: none; }
+.proof-mode .result .target, .proof-mode .result .reading, .proof-mode .controls { display: none; }
+.proof-mode .equation { display: block; }
+.proof-mode .game { left: 0; margin-top: calc(var(--slide-board-top) - 8px); margin-left: calc(var(--slide-board-center) - (3 * var(--cell) + 2 * var(--gap)) / 2 - var(--edge)); }
+.proof-mode .controls { margin-left: 0; }
+@media (max-width: 560px) {
+  :root { --edge: 12px; --results: 76px; --gap: 8px; }
+  .game { left: 0; }
+  .board { grid-template-rows: repeat(3, var(--cell)) 60px; }
+  .result { gap: 4px; font-size: 16px; }
+  .result .mark { width: 12px; }
+  .controls { margin-top: 12px; margin-left: 0; }
+  .secondary { gap: 16px; }
+  .randomize { padding: 8px 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .cell, .trace, .circuit-node { transition: none; } }
+.cell-operator { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: clamp(24px, calc(var(--cell) * .25), 44px); }
+.cell-operator sub { align-self: auto; position: relative; top: .3em; }
+.cell.filled .cell-operator, .proof-mode .cell-operator { display: none; }
+.classical-mode .cell-operator { inset: 12px 0 auto; display: block; }
+.cell-operator i { font-family: var(--math-variable-font); font-style: normal; }
+.cell-operator sub { font-size: .65em; }
+.classical-mode .glyph { top: 22px; height: calc(100% - 22px); }
+.classical-mode .hint, .classical-mode .randomize:not(.reset-board) { display: none; }
+</style>
+</head>
+<body>
+<main class="game" aria-label="Fixed-value sign game">
+  <div class="board-heading">
+    <p class="instructions" id="game-instructions"></p>
+  </div>
+  <div class="board" aria-label="Nine signs with row and column product constraints" aria-describedby="game-instructions"></div>
+  <div class="controls">
+    <button type="button" class="randomize">Randomize</button>
+    <button type="button" class="randomize reset-board">Clear board</button>
+    <div class="secondary">
+      <span class="score"></span>
+      <button type="button" class="hint">Hint</button>
+    </div>
+  </div>
+  <p class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+</main>
+<script>
+(() => {
+  const board = document.querySelector('.board');
+  const score = document.querySelector('.score');
+  const instructions = document.querySelector('.instructions');
+  const announcement = document.querySelector('[role="status"]');
+  const groups = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8]];
+  const classical = new URLSearchParams(location.search).has('classical');
+  if (classical) document.documentElement.classList.add('classical-mode');
+  const targets = classical ? [1,1,null,1,1,null] : [1,1,1,1,1,-1];
+  const operators = ['X₁','X₂','X₁X₂','Y₂','Y₁','Y₁Y₂','X₁Y₂','Y₁X₂','Z₁Z₂'];
+  const operatorHTML = ['X_1','X_2','X_1X_2','Y_2','Y_1','Y_1Y_2','X_1Y_2','Y_1X_2','Z_1Z_2'].map(s => s.replace(/([XYZ])_([12])/g, '<i>$1</i><sub>$2</sub>'));
+  const letters = 'abcdefghj';
+  const equations = ['abc = 1', 'def = 1', 'ghj = 1', 'adg = 1', 'beh = 1', 'cfj = −1'];
+  const proofMode = document.documentElement.classList.contains('proof-mode');
+  const cells = [];
+  const results = [];
+  const rowRails = [];
+  const columnRails = [];
+  const electrons = [];
+  const wakeLength = 8;
+  const exits = [];
+  let circuitLayer;
+  let circuitLayout = newCircuitLayout();
+  let animationFrame = 0;
+  const svgNamespace = 'http://www.w3.org/2000/svg';
+  const circuitry = document.createElementNS(svgNamespace, 'svg');
+  circuitry.classList.add('circuitry');
+  circuitry.setAttribute('aria-hidden', 'true');
+  circuitry.setAttribute('focusable', 'false');
+  document.querySelector('.game').prepend(circuitry);
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let feedbackTimer;
+  let values = null;
+  const glyphPath = contours => contours.map(points => "M" + points.map(point => point.join(",")).join("L") + "Z").join("");
+  let hint = 0;
+  const sign = value => value === 1 ? '+1' : '−1';
+  const groupName = i => i < 3 ? `Row ${i + 1}` : `Column ${i - 2}`;
+
+  for (let i = 0; i < 9; i++) {
+    const cell = document.createElement('button');
+    cell.type = 'button';
+    cell.className = 'cell';
+    cell.dataset.cell = i;
+    cell.style.gridRow = Math.floor(i / 3) + 1;
+    cell.style.gridColumn = i % 3 + 1;
+    cell.innerHTML = `<span class="value math-text"></span><span class="placeholder math-variable">${letters[i]}</span><svg class="glyph" viewBox="0 0 200 200" aria-hidden="true"><path fill-rule="evenodd"/></svg>`;
+    cell.insertAdjacentHTML('beforeend', `<span class="cell-operator math-text">${operatorHTML[i]}</span>`);
+    board.append(cell);
+    cells.push(cell);
+  }
+  for (let i = 0; i < 6; i++) {
+    const result = document.createElement('div');
+    result.className = 'result';
+    result.style.gridRow = i < 3 ? i + 1 : 4;
+    result.style.gridColumn = i < 3 ? 4 : i - 2;
+    result.innerHTML = '<span class="target"></span><span class="reading"><span class="actual math-text"></span><span class="mark" aria-hidden="true"></span></span>';
+    board.append(result);
+    const equation = document.createElement('span');
+    equation.className = 'equation math-variable';
+    const [variables, constant] = equations[i].split(' = ');
+    equation.innerHTML = `${variables}<span class="constant math-text"> = ${constant}</span>`;
+    result.append(equation);
+    results.push(result);
+  }
+
+  function render(message) {
+    const started = values !== null;
+    document.querySelector(".hint").disabled = !started;
+    cells.forEach((cell, i) => {
+      cell.disabled = proofMode;
+      const filled = started && values[i] !== null;
+      cell.classList.toggle('filled', filled);
+      cell.querySelector('.glyph path').setAttribute('d', proofMode ? glyphPath(signGlyphs[letters[i]]) : filled ? glyphPath(signGlyphs[sign(values[i])]) : '');
+      cell.querySelector('.value').textContent = filled ? sign(values[i]) : '';
+      cell.setAttribute('aria-label', proofMode ? `${letters[i]}: fixed sign, plus or minus one.` : `Row ${Math.floor(i / 3) + 1}, column ${i % 3 + 1}, ${operators[i]}: ${filled ? sign(values[i]) + '. Flip sign.' : 'unassigned. Click to enter +1.'}`);
+    });
+    let passed = 0;
+    results.forEach((result, i) => {
+      const complete = started && groups[i].every(j => values[j] !== null);
+      const actual = complete ? groups[i].reduce((product, j) => product * values[j], 1) : null;
+      const required = targets[i] !== null;
+      const matches = required && complete && actual === targets[i];
+      passed += Number(matches);
+      result.classList.toggle('mismatch', complete && required && !matches);
+      result.querySelector('.actual').textContent = complete ? sign(actual) : '—';
+      result.querySelector('.target').innerHTML = required ? `Target <span class="math-text">${sign(targets[i])}</span>` : 'Product';
+      result.querySelector('.mark').textContent = complete && required ? (matches ? '✓' : '×') : '';
+      result.setAttribute('aria-label', !required ? `${groupName(i)}: ${complete ? 'product ' + sign(actual) : 'awaiting values'}. No prescribed sign.` : proofMode ? equations[i] : complete ? `${groupName(i)}: product ${sign(actual)}, required ${sign(targets[i])}, ${matches ? 'satisfied' : 'not satisfied'}.` : `${groupName(i)}: required ${sign(targets[i])}, awaiting values.`);
+    });
+    score.innerHTML = started ? `<span class="math-text">${passed}</span> of <span class="math-text">${classical ? 4 : 6}</span> satisfied` : '';
+    instructions.innerHTML = classical
+      ? 'Click a symbol for <span class="math-text">+1</span>; click again to flip its sign.'
+      : '';
+    document.querySelector('.board-heading').setAttribute('aria-hidden', String(proofMode));
+    if (message) announcement.textContent = `${message} ${score.textContent}.`;
+  }
+
+  function highlight(index) {
+    cells.forEach((cell, i) => cell.classList.toggle('related', index !== null && (Math.floor(i / 3) === Math.floor(index / 3) || i % 3 === index % 3)));
+  }
+
+  function svgElement(tag, attributes, parent = circuitLayer || circuitry) {
+    const element = document.createElementNS(svgNamespace, tag);
+    Object.entries(attributes).forEach(([name, value]) => element.setAttribute(name, value));
+    parent.append(element);
+    return element;
+  }
+
+  function center(element) {
+    const rect = element.getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  }
+
+  function newCircuitLayout() {
+    return Array.from({ length: 9 }, () => ({
+      inset: .24 + Math.random() * .13,
+      bend: .2 + Math.random() * .45,
+      lane: Math.random(),
+      side: Math.random() < .5 ? -1 : 1
+    }));
+  }
+
+  function pathThrough(points) {
+    return points.map((point, i) => `${i ? 'L' : 'M'} ${point.x} ${point.y}`).join(' ');
+  }
+
+  function cornerRoute(start, end, bend, vertical) {
+    const a = vertical ? { x: start.y, y: start.x } : start;
+    const b = vertical ? { x: end.y, y: end.x } : end;
+    const sx = Math.sign(b.x - a.x), sy = Math.sign(b.y - a.y);
+    const elbow = Math.min(Math.abs(b.y - a.y) / 2, Math.abs(b.x - a.x) * .15, 80);
+    const knee = a.x + (b.x - a.x) * bend;
+    const points = [a, { x: knee, y: a.y }, { x: knee + sx * elbow, y: a.y + sy * elbow },
+      { x: knee + sx * elbow, y: b.y - sy * elbow }, { x: knee + sx * elbow * 2, y: b.y }, b];
+    return vertical ? points.map(point => ({ x: point.y, y: point.x })) : points;
+  }
+
+  function drawCircuits() {
+    clearElectrons();
+    circuitry.replaceChildren();
+    exits.length = 0;
+    rowRails.length = 0;
+    columnRails.length = 0;
+    const width = document.documentElement.clientWidth, height = document.documentElement.clientHeight;
+    const bounds = board.getBoundingClientRect();
+    const boardCenter = center(board);
+    circuitry.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    const defs = svgElement('defs', {}, circuitry);
+    const radius = Math.max(...[{ x: 0, y: 0 }, { x: width, y: 0 }, { x: 0, y: height }, { x: width, y: height }]
+      .map(point => Math.hypot(point.x - boardCenter.x, point.y - boardCenter.y)));
+    const fade = svgElement('radialGradient', { id: 'circuit-fade-gradient', gradientUnits: 'userSpaceOnUse', cx: boardCenter.x, cy: boardCenter.y, r: radius }, defs);
+    [[0, 1], [.3, 1], [.65, .2], [1, .08]].forEach(([offset, opacity]) => {
+      svgElement('stop', { offset, 'stop-color': 'white', 'stop-opacity': opacity }, fade);
+    });
+    const mask = svgElement('mask', { id: 'circuit-fade', maskUnits: 'userSpaceOnUse', x: 0, y: 0, width, height }, defs);
+    svgElement('rect', { width, height, fill: 'url(#circuit-fade-gradient)' }, mask);
+    circuitLayer = svgElement('g', { mask: 'url(#circuit-fade)' }, circuitry);
+    for (let i = 0; i < 6; i++) {
+      const vertical = i >= 3, lane = vertical ? i - 3 : i;
+      const layout = circuitLayout[i];
+      const origin = center(cells[vertical ? lane : lane * 3]);
+      const end = center(results[i]);
+      const inset = cells[0].offsetWidth * layout.inset;
+      const rail = vertical ? origin.x + inset : origin.y + inset;
+      const start = vertical ? { x: rail, y: bounds.top - 16 } : { x: bounds.left - 8, y: rail };
+      const d = vertical
+        ? `M ${start.x} ${start.y} V ${end.y - 52} L ${end.x} ${end.y - 28} V ${end.y}`
+        : `M ${start.x} ${start.y} H ${end.x - 52} L ${end.x - 28} ${end.y} H ${end.x}`;
+      const nearCorner = vertical
+        ? { x: width * (.025 + lane * .475), y: 12 + layout.lane * 20 }
+        : { x: 12 + layout.lane * 20, y: height * (.025 + lane * .475) };
+      const farCorner = vertical
+        ? { x: width * (.025 + lane * .475), y: height - 12 - layout.lane * 20 }
+        : { x: width - 12 - layout.lane * 20, y: height * (.025 + lane * .475) };
+      const before = cornerRoute(start, nearCorner, layout.bend, vertical);
+      const after = cornerRoute(end, farCorner, 1 - layout.bend, vertical);
+      exits.push({ start, end, before, after });
+      (vertical ? columnRails : rowRails).push(rail);
+      const group = svgElement('g', { class: 'context-traces' });
+      // The particles follow these same angled copper traces around the signs.
+      [d, pathThrough(before), pathThrough(after)].forEach(route => svgElement('path', { class: 'trace', d: route }, group));
+      [nearCorner, farCorner].forEach(point => svgElement('circle', { class: 'circuit-node', cx: point.x, cy: point.y, r: 3 }, group));
+    }
+    // Parallel branches give the quiet underlay a circuit-board texture.
+    cells.forEach((cell, i) => {
+      const point = center(cell), size = cell.offsetWidth, layout = circuitLayout[i];
+      const x = point.x + layout.side * size * layout.inset;
+      const y = point.y - size * (.25 + layout.lane * .15);
+      const route = `M ${x} ${y} V ${point.y - 16} L ${x + layout.side * 12} ${point.y - 4} V ${point.y + size * .3} H ${point.x + layout.side * size * .42}`;
+      svgElement('path', { class: 'trace', d: route });
+      svgElement('circle', { class: 'circuit-node', cx: x, cy: y, r: 2.5 });
+    });
+  }
+
+  function clearElectrons() {
+    cancelAnimationFrame(animationFrame);
+    animationFrame = 0;
+    electrons.splice(0).forEach(({ path, particle }) => { path.remove(); particle.remove(); });
+  }
+
+  function animateElectrons(now) {
+    for (let i = electrons.length - 1; i >= 0; i--) {
+      const electron = electrons[i];
+      const progress = Math.min(1, (now - electron.start) / electron.duration);
+      const distance = progress * electron.length;
+      const point = electron.path.getPointAtLength(distance);
+      const opacity = Math.min(1, progress / .06, (1 - progress) / .18) * electron.strength;
+      electron.particle.setAttribute('cx', point.x);
+      electron.particle.setAttribute('cy', point.y);
+      electron.particle.style.opacity = opacity;
+      electron.path.style.strokeDashoffset = wakeLength - distance;
+      electron.path.style.opacity = opacity * .15;
+      if (progress === 1) {
+        electron.path.remove();
+        electron.particle.remove();
+        electrons.splice(i, 1);
+      }
+    }
+    animationFrame = electrons.length ? requestAnimationFrame(animateElectrons) : 0;
+  }
+
+  function emitElectrons(index, origin) {
+    if (reducedMotion.matches || !rowRails.length) return;
+    const row = Math.floor(index / 3), col = index % 3;
+    const y = rowRails[row], x = columnRails[col];
+    const rowEnd = center(results[row]), colEnd = center(results[3 + col]);
+    const horizontal = exits[row], vertical = exits[3 + col];
+    const paths = [
+      `M ${origin.x} ${origin.y} L ${origin.x - 12} ${origin.y + 12} V ${y} L ${horizontal.start.x} ${y} ${pathThrough(horizontal.before).replace(/^M/, 'L')}`,
+      `M ${origin.x} ${origin.y} L ${origin.x + 12} ${origin.y + 12} V ${y} H ${rowEnd.x - 52} L ${rowEnd.x - 28} ${rowEnd.y} H ${rowEnd.x} ${pathThrough(horizontal.after).replace(/^M/, 'L')}`,
+      `M ${origin.x} ${origin.y} L ${origin.x + 12} ${origin.y - 12} H ${x} V ${vertical.start.y} ${pathThrough(vertical.before).replace(/^M/, 'L')}`,
+      `M ${origin.x} ${origin.y} L ${origin.x + 12} ${origin.y + 12} H ${x} V ${colEnd.y - 52} L ${colEnd.x} ${colEnd.y - 28} V ${colEnd.y} ${pathThrough(vertical.after).replace(/^M/, 'L')}`
+    ];
+    paths.forEach(d => {
+      const path = svgElement('path', { class: 'electron-wake', d });
+      const length = path.getTotalLength();
+      path.style.strokeDasharray = `${wakeLength} ${length + wakeLength}`;
+      path.style.strokeDashoffset = wakeLength;
+      path.style.opacity = 0;
+      const particle = svgElement('circle', { class: 'electron', r: 1.4, cx: origin.x, cy: origin.y });
+      particle.style.opacity = 0;
+      electrons.push({ path, particle, length, start: performance.now(), duration: 350 + length * .8, strength: .3 });
+    });
+    if (!animationFrame) animationFrame = requestAnimationFrame(animateElectrons);
+  }
+
+  function pointerOrigin(event) {
+    return { x: event.clientX, y: event.clientY };
+  }
+
+  function clearFeedback() {
+    clearTimeout(feedbackTimer);
+    cells.forEach(cell => cell.getAnimations().forEach(animation => animation.cancel()));
+    results.forEach(result => result.classList.remove('corrected', 'broken'));
+  }
+
+  function ripple(index, origin) {
+    clearElectrons();
+    emitElectrons(index, origin);
+    const row = Math.floor(index / 3), col = index % 3;
+    if (!reducedMotion.matches) {
+      cells.forEach((cell, i) => {
+        if (Math.floor(i / 3) !== row && i % 3 !== col) return;
+        const distance = Math.abs(Math.floor(i / 3) - row) + Math.abs(i % 3 - col);
+        cell.animate([{ backgroundColor: getComputedStyle(cell).getPropertyValue('--tile-click') },
+          { backgroundColor: getComputedStyle(cell).backgroundColor }], { duration: 420, delay: distance * 70, easing: 'ease-out' });
+      });
+    }
+    [row, 3 + col].forEach(i => results[i].classList.add(results[i].classList.contains('mismatch') ? 'broken' : 'corrected'));
+    feedbackTimer = setTimeout(() => results.forEach(result => result.classList.remove('corrected', 'broken')), 900);
+  }
+
+  board.addEventListener('click', event => {
+    const cell = event.target.closest('[data-cell]');
+    if (!cell || proofMode) return;
+    if (!values) values = Array(9).fill(null);
+    const i = Number(cell.dataset.cell);
+    clearFeedback();
+    values[i] = values[i] === null ? 1 : -values[i];
+    render(`Row ${Math.floor(i / 3) + 1}, column ${i % 3 + 1} changed to ${sign(values[i])}.`);
+    publish();
+    ripple(i, event.detail === 0 ? center(cell) : pointerOrigin(event));
+  });
+  for (const eventName of ['pointerover', 'focusin']) {
+    board.addEventListener(eventName, event => {
+      const cell = event.target.closest('[data-cell]');
+      if (cell && values && !proofMode) highlight(Number(cell.dataset.cell));
+    });
+  }
+  board.addEventListener('pointerleave', () => highlight(null));
+  board.addEventListener('focusout', event => { if (!board.contains(event.relatedTarget)) highlight(null); });
+
+  document.querySelector('.randomize').addEventListener('click', () => {
+    clearFeedback();
+    clearElectrons();
+    values = Array.from({ length: 9 }, () => Math.random() < .5 ? -1 : 1);
+    hint = 0;
+    highlight(null);
+    render('Randomized all nine values.');
+    publish();
+    circuitLayout = newCircuitLayout();
+    drawCircuits();
+  });
+  document.querySelector('.hint').addEventListener('click', () => {
+    const hints = ['Multiply the three row requirements.', 'Now multiply the three column requirements.', 'Both calculations use every square once.'];
+    instructions.textContent = hints[Math.min(hint++, hints.length - 1)];
+    announcement.textContent = instructions.textContent;
+    drawCircuits();
+  });
+  document.querySelector('.reset-board').addEventListener('click', () => {
+    clearFeedback(); clearElectrons(); values = null; hint = 0; highlight(null); render('Board cleared.'); publish();
+  });
+  function publish() {
+    if (classical) return;
+    if (window.parent !== window) window.parent.postMessage({ type: 'sign-game-state', values }, location.origin);
+  }
+  window.addEventListener('message', event => {
+    if (event.source !== window.parent || event.origin !== location.origin) return;
+    if (classical || event.data?.type !== 'sign-game-state') return;
+    const next = event.data.values;
+    if (next !== null && (!Array.isArray(next) || next.length !== 9 || !next.every(value => value === null || value === 1 || value === -1))) return;
+    clearFeedback();
+    clearElectrons();
+    highlight(null);
+    values = next;
+    hint = 0;
+    announcement.textContent = '';
+    render();
+  });
+  reducedMotion.addEventListener('change', clearElectrons);
+  render();
+  new ResizeObserver(drawCircuits).observe(board);
+  window.addEventListener('resize', drawCircuits);
+})();
+</script>
+</body>
+</html>

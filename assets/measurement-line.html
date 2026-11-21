@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sequential color measurements</title>
+<link rel="preload" href="fonts/cmmi10.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="fonts/cmr10.ttf" as="font" type="font/ttf" crossorigin>
+<script src="presentation-theme.js"></script>
+<link rel="stylesheet" href="math.css"><link rel="stylesheet" href="layout.css"><link rel="stylesheet" href="crt-screen.css"><link rel="stylesheet" href="cat-sprites/sprite.css"><link rel="stylesheet" href="device-prototype.css"><link rel="stylesheet" href="measurement-line.css">
+</head><body>
+<main class="measurement-line">
+<div class="machine pipeline" aria-label="Three measuring devices on one conveyor">
+<div class="belt" aria-hidden="true"><i class="roller"></i><i class="roller"></i></div>
+<div class="line-parcels"></div>
+</div>
+<div class="knowledge-timeline" role="log" aria-live="polite" aria-label="Measurement results and observed properties"></div>
+<p class="line-status" role="status"></p>
+</main>
+<template id="station-template"><div class="station"> <div class="case">
+  <i class="bolt a"></i><i class="bolt b"></i><i class="bolt c"></i><i class="bolt d"></i>
+  <div class="bezel"><div class="crt-screen" role="img" aria-label="Ready to measure two sealed boxes"><div class="crt-content">
+   <div class="window-world"><div class="window-belt"></div></div>
+   <div class="inspector" aria-hidden="true"><div class="inspector-sprite" data-render="outline"></div></div><div class="screen-answer"><div class="screen-result"></div><div class="screen-equation math-text"></div></div>
+  </div><div class="crt-roll" aria-hidden="true"></div></div></div>
+  <div class="controls" aria-hidden="true"><div class="vents"></div><i class="lamp"></i><i class="knob"></i><i class="knob"></i><div class="vents"></div></div>
+ <div class="device-operator" aria-label="Measurement operator"></div>
+ </div></div></template>
+<script type="module" src="measurement-line.js"></script>
+</body></html>

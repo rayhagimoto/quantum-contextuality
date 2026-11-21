@@ -1,0 +1,4 @@
+/* Viewport overlay preserves the shared slide layout while glyphs travel. */
+.proof-manim-layer { position: fixed; inset: 0; pointer-events: none; z-index: 40; }
+.proof-manim-glyph { position: absolute; display: block; overflow: hidden; }
+#sign-proof .manim-target-hidden { opacity: 0; }

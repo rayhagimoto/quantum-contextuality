@@ -1,0 +1,12 @@
+::: {.slide-board .slide-table-board .proof-table}
+::: {.empirical-products .proof-symbol-table}
+$$
+\begin{array}{c|c|c||c}
+\rule{0pt}{1.4em}\class{proof-slot-0}{X_1} & \class{proof-slot-1}{X_2} & \class{proof-slot-2}{\hphantom{\;}\class{proof-context}{X_1 X_2}\hphantom{\;}} & \class{proof-slot-3}{=+1} \\ \hline
+\rule{0pt}{1.4em}\class{proof-slot-4}{Y_2} & \class{proof-slot-5}{Y_1} & \class{proof-slot-6}{\hphantom{\;}\class{proof-context}{Y_1 Y_2}\hphantom{\;}} & \class{proof-slot-7}{=+1} \\ \hline
+\rule{0pt}{1.4em}\class{proof-slot-8}{\class{proof-context}{X_1 Y_2}} & \class{proof-slot-9}{\class{proof-context}{Y_1 X_2}} & \class{proof-slot-10}{\class{proof-context}{Z_1 Z_2}} & \class{proof-slot-11}{\class{proof-context}{=+1}} \\ \dhline
+\class{proof-slot-12}{=+1} & \class{proof-slot-13}{=+1} & \class{proof-slot-14}{\class{proof-context}{=-1}} &
+\end{array}
+$$
+:::
+:::

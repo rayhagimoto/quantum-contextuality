@@ -1,0 +1,105 @@
+:root { --title-art: url("title-light.svg"); }
+:root[data-theme="dark"] { --title-art: url("title-dark.svg"); }
+
+.reveal #title-slide {
+  /* The SVG divider is centered at y=382 on its 1280 × 720 canvas. */
+  --title-divider: 53.05555556%;
+  --title-divider-gap: 96px;
+  --title-text-left: 5.46875%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 0;
+  background: var(--page-bg) var(--title-art) center / 100% 100% no-repeat;
+  text-align: left;
+}
+
+.reveal #title-slide h1 {
+  position: absolute;
+  top: auto;
+  bottom: calc(100% - var(--title-divider) + var(--title-divider-gap));
+  left: var(--title-text-left);
+  width: 66%;
+  margin: 0;
+  color: var(--page-heading);
+  font-size: 1.9em;
+  line-height: 1.2;
+}
+
+.reveal #title-slide .subtitle {
+  position: absolute;
+  top: calc(var(--title-divider) + 72px);
+  left: var(--title-text-left);
+  margin: 0;
+  color: var(--page-heading);
+  font-size: 1.1em;
+  line-height: 1.3;
+}
+
+.reveal #title-slide .title-footer {
+  position: absolute;
+  top: 79%;
+  left: var(--title-text-left);
+  width: 60%;
+  color: var(--page-heading);
+  text-align: left;
+}
+
+.reveal #title-slide .quarto-title-authors {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 0.3em 1.5em;
+  margin: 0;
+  font-size: 0.8em;
+}
+
+.reveal #title-slide .quarto-title-author {
+  flex: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Infleqtion Divider Slide_White, scaled from the original 16:9 layout. */
+.reveal .slides section.chapter-divider {
+  top: 0 !important;
+  height: 1080px;
+  padding: 0;
+  background: #fff url("divider-light.svg") center / 100% 100% no-repeat;
+  text-align: left;
+}
+.reveal .chapter-divider h1 {
+  position: absolute;
+  top: auto;
+  bottom: 40.444%;
+  left: 5.067%;
+  width: 90%;
+  margin: 0;
+  font-size: 84px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+:root[data-theme="dark"] .reveal .slides section.chapter-divider {
+  background: var(--page-bg) url("divider-dark.svg") center / 100% 100% no-repeat;
+}
+:root[data-theme="dark"] .reveal .chapter-divider h1 { color: #fff; }
+
+/* Quarto's global logo stays visible on title, divider, and activity slides. */
+.reveal .slide-logo {
+  display: block !important;
+  position: fixed;
+  left: 16px !important;
+  right: auto !important;
+  bottom: 18px !important;
+  width: 132px !important;
+  height: auto !important;
+  max-width: none !important;
+  max-height: none !important;
+  z-index: 30;
+}
+/* Keep the slide menu above the logo rather than on top of it. */
+.reveal .slide-menu-button { bottom: 76px !important; }
+.reveal .slide-number { top: auto !important; bottom: 8px !important; right: 8px !important; }

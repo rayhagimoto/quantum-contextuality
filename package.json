@@ -1,0 +1,26 @@
+{
+  "name": "quantum-contextuality",
+  "version": "1.0.0",
+  "description": "Run the reveal.js presentation from the project root:",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:math": "node scripts/build-math.mjs",
+    "watch:math": "node scripts/build-math.mjs --watch",
+    "build": "npm run build:math && quarto render"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "manim-web": "^0.42.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

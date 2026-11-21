@@ -1,0 +1,27 @@
+/* Equal-cell atlas; set --sprite-size on the element to scale the character. */
+.cat-sprite {
+  display: block;
+  width: var(--sprite-size, 128px);
+  aspect-ratio: 1;
+  background-image: url('./cat-atlas.png');
+  background-size: 400% 500%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  transform: scaleX(var(--sprite-facing, 1));
+}
+.cat-sprite[data-facing="left"] { --sprite-facing: -1; }
+.cat-sprite[data-palette="phosphor"] {
+  filter: grayscale(1) sepia(1) saturate(3) hue-rotate(65deg) brightness(1.12);
+}
+
+/* Black in the atlas becomes transparent; only its white contours are drawn.
+ * currentColor inherits the CRT screen's default color without a green filter. */
+.cat-sprite[data-render="outline"] {
+  background-image: none;
+  background-color: currentColor;
+  mask-image: url('./cat-crt-full-v4.png');
+  mask-mode: luminance;
+  mask-size: 400% 500%;
+  mask-repeat: no-repeat;
+  filter: none;
+}

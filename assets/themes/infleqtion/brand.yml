@@ -1,0 +1,11 @@
+logo:
+  images:
+    color:
+      path: logo-rgb-color.svg
+      alt: Infleqtion
+    white-teal:
+      path: logo-rgb-white-teal.svg
+      alt: Infleqtion
+  medium:
+    light: color
+    dark: white-teal

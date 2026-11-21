@@ -1,0 +1,69 @@
+/* Slide 3 is the alignment reference for board-and-explanation slides. */
+:root {
+  --slide-canvas-height: 1080px;
+  --slide-title-height: 104px;
+  --slide-title-gap: 56px;
+  --slide-body-top: calc(var(--slide-title-height) + var(--slide-title-gap));
+  --slide-body-bottom: 72px;
+  --slide-body-gap: 48px;
+  --slide-body-center: calc((var(--slide-canvas-height) + var(--slide-body-top) - var(--slide-body-bottom)) / 2);
+  --slide-tile-size: 176px;
+  --slide-tile-gap: 12px;
+  --slide-board-width: calc(3 * var(--slide-tile-size) + 2 * var(--slide-tile-gap));
+  --slide-board-center: 300px;
+  --slide-board-left: calc(var(--slide-board-center) - var(--slide-board-width) / 2);
+  --slide-board-top: calc(var(--slide-body-center) - var(--slide-board-width) / 2);
+  --slide-panel-left: 48%;
+  --slide-selector-size: 48px;
+  --slide-selector-gap: 18px;
+}
+/* Center the board on its shared axis and keep explanatory content in one column. */
+.slide-board {
+  position: absolute;
+  left: var(--slide-board-left);
+  top: var(--slide-board-top);
+}
+.slide-side-panel {
+  position: absolute;
+  top: var(--slide-body-top);
+  bottom: var(--slide-body-bottom);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  left: var(--slide-panel-left);
+  right: 0;
+}
+
+/* Flow content and diagram panels share the same space beneath the title. */
+.reveal .slides section:not(#title-slide) > h2 {
+  margin: 0;
+  min-height: var(--slide-title-height);
+  line-height: 1.2;
+}
+.reveal .slide-body {
+  position: absolute;
+  top: var(--slide-body-top);
+  bottom: var(--slide-body-bottom);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--slide-body-gap);
+}
+.reveal .slide-body > * { margin: 0; flex-shrink: 0; }
+.reveal .slide-side-panel > * { flex-shrink: 0; }
+
+/* Wide math tables fill the column beside the shared explanation panel. */
+.slide-table-board {
+  position: absolute;
+  top: var(--slide-body-top);
+  bottom: var(--slide-body-bottom);
+  left: 0;
+  width: calc(var(--slide-panel-left) - var(--slide-body-gap));
+}
+
+/* Text-led slides start at the shared title gap instead of centering a short group. */
+.reveal .slide-body.slide-body-start { justify-content: flex-start; }
+.reveal .slides .slide-body-start > * { margin: 0; }
+.reveal .slides .slide-body-start .katex-display { margin: 0; }

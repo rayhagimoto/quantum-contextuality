@@ -1,0 +1,134 @@
+/* All deck measurement devices share this renderer and screen layout. */
+.measurement-line { height: 100vh; min-height: 0; gap: 18px; padding: 18px 24px; }
+.line-intro, .line-status { margin: 0; text-align: center; font-size: 25px; color: var(--device-ink); }
+.line-status { color: var(--device-muted); min-height: 1.5em; }
+.pipeline { width: 100%; aspect-ratio: 3.6; --conveyor-level: 60%; --device-unit: .85cqw; }
+.station { position: absolute; top: 0; width: calc(66% / var(--station-count)); height: 100%; left: calc(12% + var(--station) * 81% / var(--station-count)); }
+.station .case { inset: 0 0 auto; border-width: 6px; padding: 12px 14px 8px; }
+.station .bezel { padding: 8px; }
+.station .controls { height: 38px; }
+.station .vents { width: 40px; height: 22px; }
+.station .knob { width: 25px; height: 25px; border-width: 3px; }
+.station .screen-result { font-size: calc(1.6 * var(--device-unit, 1cqw)); top: 0; height: 15%; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
+.station .screen-equation { font-size: calc(2.6 * var(--device-unit, 1cqw)); top: 85%; bottom: auto; transform: translateY(-50%); visibility: hidden; }
+.station[data-phase="done"] .screen-equation { visibility: visible; }
+.pipeline .station .inspector { --sprite-size: calc(4.5 * var(--device-unit, 1cqw)); transition: left var(--inspection-walk-duration, 600ms) ease-in-out, opacity .2s; }
+.station[data-phase="done"] .inspector { opacity: .1; }
+.station[data-phase="done"] .window-world { opacity: .1; }
+.station .window-world { transition: opacity .2s; }
+@media (prefers-reduced-motion: reduce) { .pipeline .station .inspector { transition: none; } }
+.station.scanning .inspector { opacity: 1; }
+.pipeline .parcel { width: 3.4%; }
+.pipeline .parcel .qubit { font-size: 1.25cqw; }
+.pipeline .parcel .seal { font-size: .45cqw; }
+.pipeline .belt { height: 9%; border-width: 5px; }
+.knowledge-timeline { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); align-items: start; }
+.knowledge-entry { text-align: center; visibility: hidden; }
+.knowledge-entry.revealed { visibility: visible; }
+.knowledge-equation { font-size: 34px; border-bottom: 1px solid var(--device-line); padding-bottom: 12px; margin-bottom: 14px; position: relative; }
+.knowledge-equation::after { content: ''; position: absolute; width: 7px; height: 7px; border-radius: 50%; background: var(--device-result); bottom: -4px; left: calc(50% - 3px); }
+.knowledge-pair { display: flex; justify-content: center; gap: 26px; }
+.knowledge-trinket { margin: 0; width: 126px; }
+.knowledge-trinket svg { width: 80px; height: 70px; overflow: visible; }
+.unknown-outline { fill: none; stroke: var(--device-muted); stroke-width: 2; stroke-dasharray: 5 4; }
+.knowledge-trinket[data-color="orange"] .unknown-outline { fill: #ef8424; }
+.knowledge-trinket[data-color="teal"] .unknown-outline { fill: #18b3b1; }
+.knowledge-trinket figcaption { font-size: 15px; line-height: 1.5; color: var(--device-muted); }
+.knowledge-trinket .trinket-number { font-size: 21px; color: var(--device-ink); }
+.math-text i { font-family: var(--math-variable-font); font-style: normal; }
+.math-text sub { font-family: var(--math-font); font-size: .65em; }
+@media (max-height: 720px) { .measurement-line { gap: 10px; } .knowledge-trinket svg { height: 50px; } }
+.pipeline, .knowledge-timeline { max-width: 1640px; }
+
+/* The conveyor lessons show each result on its device; center that group alone. */
+body:not(.measurement-tray) .pipeline { aspect-ratio: 5; margin-bottom: 0; }
+body:not(.measurement-tray) .knowledge-timeline { display: none; }
+body:not(.measurement-tray) .line-status {
+ position: absolute; width: 1px; height: 1px; overflow: hidden;
+ clip-path: inset(50%); white-space: nowrap;
+}
+
+.station.scanning .screen-equation { visibility: hidden; }
+.knowledge-equation { height: 64px; line-height: 44px; }
+.knowledge-timeline { height: 215px; flex-shrink: 0; }
+
+.known-shape { stroke-dasharray: none; }
+
+/* A tray example is the same linked device asset with one station. */
+.measurement-tray .measurement-line { justify-content: center; padding: 12px; }
+.measurement-tray .line-intro, .measurement-tray .knowledge-timeline,
+.measurement-tray .line-status { display: none; }
+.measurement-tray .pipeline { aspect-ratio: 2.5; --device-unit: 1.8cqw; }
+.measurement-tray .station { left: 29%; width: 42%; }
+.measurement-tray .pipeline .parcel { width: 6%; }
+.measurement-tray .pipeline .parcel .qubit { font-size: 2cqw; }
+.measurement-tray .pipeline .parcel .seal { font-size: .7cqw; }
+
+/* Reveal words over the dimmed inspection stage, matching the equation's cap height. */
+.station[data-phase="done"] .screen-result {
+ top: 7%; height: 60%; z-index: 1;
+ font-size: calc(2.6 * 1.22 * var(--device-unit, 1cqw));
+ line-height: .95; white-space: normal;
+ flex-direction: column;
+}
+.station .screen-equation { z-index: 1; }
+
+/* Operator identity remains visible before, during, and after inspection. */
+.pipeline { margin-bottom: 48px; }
+.device-operator { position: absolute; top: calc(100% + 12px); left: 0; width: 100%; text-align: center; color: var(--device-ink); font-size: clamp(22px, 2.2cqw, 36px); line-height: 1; }
+.device-operator sub { font-size: 70%; vertical-align: -.25em; }
+
+/* One centered answer group, sized from each station's glass rather than the conveyor. */
+.station .screen-answer { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.station[data-phase="done"] .screen-answer {
+ display: flex; flex-direction: column; align-items: center; justify-content: center;
+ gap: calc(var(--screen-answer-size) * .08); padding: 8%; box-sizing: border-box;
+}
+.station[data-phase="done"] .screen-answer .screen-result,
+.station[data-phase="done"] .screen-answer .screen-equation {
+ position: static; inset: auto; height: auto; width: 100%; transform: none;
+ flex: none; margin: 0; text-align: center;
+}
+.station[data-phase="done"] .screen-answer .screen-result {
+ font-size: calc(var(--screen-answer-size) * 1.22); line-height: .95;
+}
+.station[data-phase="done"] .screen-answer .screen-result[data-lines="1"] {
+ font-size: calc(var(--screen-answer-size) * 1.55);
+}
+.station[data-phase="done"] .screen-answer .screen-equation {
+ font-size: var(--screen-answer-size); line-height: 1;
+}
+
+/* One downward phosphor sweep reveals the answer while the inspection fades. */
+.station { --result-scan-duration: 700ms; }
+.station.result-scan .screen-answer {
+ animation: answer-scan-in var(--result-scan-duration) linear both;
+}
+.station.result-scan .crt-content::after {
+ content: ''; position: absolute; left: 3%; right: 3%; top: 0; height: 1%;
+ z-index: 2; pointer-events: none; border-radius: 50%;
+ background: #d6ffe2; box-shadow: 0 0 8px #a0ffb5, 0 0 18px #70ff86;
+ animation: answer-scan-line var(--result-scan-duration) linear both;
+}
+.station.result-scan .window-world, .station.result-scan .inspector {
+ animation: answer-graphics-fade var(--result-scan-duration) linear both;
+}
+@keyframes answer-scan-in {
+ from { clip-path: inset(0 0 100% 0); }
+ to { clip-path: inset(0); }
+}
+@keyframes answer-scan-line {
+ 0% { top: 0; opacity: 0; }
+ 8% { opacity: 1; }
+ 92% { opacity: 1; }
+ 100% { top: 100%; opacity: 0; }
+}
+@keyframes answer-graphics-fade {
+ from { opacity: 1; }
+ to { opacity: .1; }
+}
+@media (prefers-reduced-motion: reduce) {
+ .station.result-scan .screen-answer,
+ .station.result-scan .window-world, .station.result-scan .inspector { animation: none; }
+ .station.result-scan .crt-content::after { display: none; }
+}
