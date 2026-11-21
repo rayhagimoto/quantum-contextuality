@@ -1,0 +1,39 @@
+@import url('crt-screen.css');
+/* Prototype: a forked experiment beside its live correlation table. */
+.reveal .empirical-lab { display: grid; grid-template-columns: 61% 39%; align-items: center; min-height: 0; height: 610px; position: relative; }
+.reveal .empirical-lab .empirical-products { font-size: .92em; }
+.reveal .empirical-lab .katex-display { margin: 0; }
+.empirical-factory { width: 100%; height: 610px; position: relative; color: var(--page-heading); }
+.empirical-factory > svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.empirical-belt-rim { fill: none; stroke: #717f83; stroke-width: 34; stroke-linecap: round; stroke-linejoin: round; }
+.empirical-belt { fill: none; stroke: #263033; stroke-width: 24; }
+.empirical-treads { fill: none; stroke: #74868a; stroke-width: 20; stroke-dasharray: 3 13; }
+.empirical-machine { will-change: transform; }
+.empirical-case { box-sizing: border-box; width: 128px; height: 104px; border: 5px solid #161f21; border-radius: 18px; padding: 7px; background: linear-gradient(120deg,#637072,#252f32); box-shadow: inset 0 2px #a1aca5,0 5px 8px #0003; }
+.empirical-case .crt-screen { height: 72px; border-radius: 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.empirical-case .device-name { font-size: 22px; line-height: 1.1; color: #c4efd0; }
+.empirical-case .device-value { font-size: 30px; height: 32px; line-height: 1; color: #a8ffbc; }
+.empirical-case .case-lamp { width: 5px; height: 5px; background: #8cff9a; border-radius: 50%; margin: 5px auto 0; box-shadow: 0 0 5px #8cff9a; }
+.empirical-box rect { fill: #8d7960; stroke: #c9b58e; stroke-width: 1.5; }
+.empirical-box .lid { fill: #a18c70; }
+.empirical-box text { fill: #fff2d5; font-size: 13px; }
+.empirical-notes { position: relative; width: 300px; height: 260px; }
+.empirical-note-cat { position: relative; width: 260px; height: 260px; }
+/* Each row is a three-pose writing loop at one fixed stress level. */
+.empirical-scribble-sheet { position: absolute; inset: 0; background: url('cat-scribbling/sprite-sheet-stress-loops.png') 0 0 / 300% 300% no-repeat; image-rendering: auto; }
+.empirical-scribble-sheet.recovering { background-image: url('cat-scribbling/sprite-sheet-recovery.png'); }
+.reveal .empirical-note-cat .empirical-sleep-frame { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; object-fit: contain; }
+.empirical-note-cat [hidden] { display: none; }
+.empirical-counters { color: var(--page-heading); font-size: 22px; text-align: center; margin-top: 20px; min-height: 2.5em; }
+.empirical-counters .count-number { font-size: 1.2em; }
+.empirical-flight { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 5; color: var(--math-orange); font-size: 38px; line-height: 1; }
+.empirical-flight.absorbing { filter: blur(1px); }
+.empirical-lab .empirical-answer, .empirical-lab .empirical-question { transition: opacity .15s; }
+#empirical-correlations .empirical-lab .empirical-products .empirical-answer { opacity: 0; }
+#empirical-correlations .empirical-lab .empirical-products .empirical-question { opacity: 1; }
+#empirical-correlations .empirical-lab .empirical-products .empirical-context { color: inherit; fill: currentColor; stroke: currentColor; }
+#empirical-correlations .empirical-lab .observed.empirical-answer { opacity: 1; }
+#empirical-correlations .empirical-lab .observed .empirical-question { opacity: 0; }
+#empirical-correlations .empirical-lab .observed.empirical-context { color: var(--math-orange); fill: currentColor; stroke: currentColor; }
+.empirical-result-hit { animation: empirical-absorb .22s ease-out; }
+@keyframes empirical-absorb { 50% { filter: drop-shadow(0 0 7px var(--math-orange)); } }

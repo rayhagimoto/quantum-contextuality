@@ -1,0 +1,41 @@
+/* Shared Computer Modern fonts for math created outside KaTeX. */
+@font-face {
+  font-family: "Computer Modern Roman";
+  src: url("fonts/cmr10.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Computer Modern Math";
+  src: url("fonts/cmmi10.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Computer Modern Symbols";
+  src: url("fonts/cm-symbols.ttf") format("truetype");
+  unicode-range: U+2212;
+}
+:root {
+  --math-font: "Computer Modern Roman", "Computer Modern Symbols", serif;
+  --math-variable-font: "Computer Modern Math", serif;
+}
+.math-text { font-family: var(--math-font); font-style: normal; font-weight: 400; }
+.math-variable { font-family: var(--math-variable-font); font-style: normal; font-weight: 400; }
+
+/* Theme-aware math palette. */
+:root {
+  --math-orange: #fe640b;
+  --math-teal: oklch(0.50 0.08 185);
+  --math-blue: oklch(0.50 0.12 255);
+  --math-purple: oklch(0.50 0.12 305);
+  --math-red: oklch(0.50 0.12 25);
+}
+:root[data-theme="dark"] {
+  --math-orange: oklch(0.80 0.12 60);
+  --math-teal: oklch(0.80 0.08 185);
+  --math-blue: oklch(0.80 0.10 255);
+  --math-purple: oklch(0.80 0.10 305);
+  --math-red: oklch(0.80 0.10 25);
+}
+.math-color-orange { color: var(--math-orange); fill: currentColor; stroke: currentColor; }
+.math-color-teal { color: var(--math-teal); fill: currentColor; stroke: currentColor; }
+.math-color-blue { color: var(--math-blue); fill: currentColor; stroke: currentColor; }
+.math-color-purple { color: var(--math-purple); fill: currentColor; stroke: currentColor; }
+.math-color-red { color: var(--math-red); fill: currentColor; stroke: currentColor; }

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recurrent-model device</title>
+  <link rel="stylesheet" href="../math.css">
+  <link rel="stylesheet" href="../layout.css">
+  <link rel="stylesheet" href="../crt-screen.css">
+  <link rel="stylesheet" href="../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="device.css">
+</head>
+<body class="recurrent-device-page">
+  <main>
+    <figure class="recurrent-machine" aria-label="Recurrent model with an internal memory and a conveyor">
+      <div class="crt-screen recurrent-glass" aria-hidden="true"></div>
+      <div class="recurrent-rules" aria-label="Outputs depend only on the memory state">
+        <span>\(00\) → phone</span><span>\(01\) → computer</span><span>\(10\) → printer</span>
+      </div>
+      <div class="recurrent-belt" aria-hidden="true"></div>
+
+      <div class="recurrent-memory recurrent-thought" data-active="false" aria-label="The cat's memory">
+        <div class="recurrent-state" role="math" aria-live="polite">\(\lambda_0 = 00\)</div>
+      </div>
+
+      <!-- The cloud overlays the cat and any tokens passing through its work area. -->
+      <div id="recurrent-tokens" class="recurrent-tokens">
+        <div class="recurrent-token math-variable" data-token="input" role="math" aria-label="Input x 1: I bought a phone yesterday">
+          <span>x<sub class="math-text">1</sub></span>
+          <span class="recurrent-token-word recurrent-example recurrent-message">“I bought a phone yesterday”</span>
+        </div>
+        <div class="recurrent-token math-variable" data-token="output" role="math" aria-label="Output y sub t" hidden><span>y<sub class="math-text">1</sub></span><span class="recurrent-token-word recurrent-example">“phone”</span></div>
+      </div>
+      <div id="recurrent-cat" class="recurrent-cat"><img src="cat/idle.png" alt=""></div>
+      <div id="recurrent-dust" class="recurrent-dust" aria-hidden="true"><img src="cat/dust-cloud.png" alt=""></div>
+      <div class="recurrent-bezel" aria-hidden="true"><i class="recurrent-lamp"></i></div>
+    </figure>
+  </main>
+  <script defer src="../vendor/katex/katex.min.js"></script>
+  <script defer src="../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../katex-init.js"></script>
+  <script defer src="../vendor/proof-math.js"></script>
+  <script defer src="animation.js"></script>
+</body>
+</html>

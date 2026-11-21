@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recurrent-model device</title>
+  <script>if (new URLSearchParams(location.search).has('empty')) document.documentElement.dataset.emptyMeasurement = 'true';</script>
+  <link rel="stylesheet" href="../math.css">
+  <link rel="stylesheet" href="../layout.css">
+  <link rel="stylesheet" href="../crt-screen.css">
+  <link rel="stylesheet" href="../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="device.css">
+</head>
+<body class="recurrent-device-page measurement-model">
+  <main>
+    <figure class="recurrent-machine" aria-label="Recurrent model processing measurements on a conveyor">
+      <div class="crt-screen recurrent-glass" aria-hidden="true"></div>
+      <div class="recurrent-belt" aria-hidden="true"></div>
+      <div class="recurrent-memory recurrent-thought" data-active="false" aria-label="Latent state">
+        <div class="recurrent-state" role="math" aria-live="polite">\(\lambda_0 = 00\)</div>
+      </div>
+
+      <!-- The cloud overlays the cat and any tokens passing through its work area. -->
+      <div id="recurrent-tokens" class="recurrent-tokens">
+        <div class="recurrent-token math-text" data-token="input" role="math"><span class="measurement-symbol"><i class="math-variable">X</i><sub>1</sub></span></div>
+        <div class="recurrent-token math-text" data-token="output" role="math" hidden>
+          <span class="measurement-symbol">+1</span>
+          <span class="measurement-error-mark" aria-hidden="true">\(\times\)</span>
+        </div>
+      </div>
+      <div id="recurrent-cat" class="recurrent-cat"><img src="cat/idle.png" alt=""></div>
+      <div id="recurrent-dust" class="recurrent-dust" aria-hidden="true"><img src="cat/dust-cloud.png" alt=""></div>
+      <div class="recurrent-bezel" aria-hidden="true"><i class="recurrent-lamp"></i></div>
+    </figure>
+    <div class="measurement-log">
+      <div class="measurement-queue"><span>Queue</span><div class="measurement-queue-items" role="math" aria-live="polite"></div><span class="measurement-queue-empty" aria-hidden="true">Complete</span></div>
+      <div class="measurement-history" aria-live="polite" aria-label="Measurement history"></div>
+    </div>
+  </main>
+  <script defer src="../vendor/katex/katex.min.js"></script>
+  <script defer src="../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../katex-init.js"></script>
+  <script defer src="../vendor/proof-math.js"></script>
+  <script defer src="animation.js"></script>
+</body>
+</html>
